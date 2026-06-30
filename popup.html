@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  :root{
+    --clay:#d9774f; --clay-hi:#e08a60; --clay-lo:#cf6a40;
+    --ink:#231309; --ink-soft:#704a34; --ink-faint:#9c7152;
+    --track:#2a1608; --line:rgba(35,19,9,.13);
+    --green:#37c46b; --green-d:#27a455; --yellow:#e6c23c; --yellow-d:#cba42a;
+    --amber:#f0962a; --amber-d:#d27c18; --red:#e8483a; --red-d:#c8331f;
+    --font:'JetBrains Mono','SF Mono',SFMono-Regular,ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--clay)}
+  body{
+    width:312px; font-family:var(--font); color:var(--ink);
+    -webkit-font-smoothing:antialiased; user-select:none; overflow:hidden;
+  }
+  .wrap{padding:13px 15px 14px}
+
+  /* ── header ── */
+  .top{display:flex; align-items:center; gap:9px}
+  .crab{width:26px;height:24px;flex:none;background:#edece6;border-radius:7px;display:grid;place-items:center;box-shadow:0 1px 2px rgba(0,0,0,.14)}
+  .crab svg{width:18px;height:16px;display:block}
+  .brand{flex:1;font-size:12px;font-weight:800;letter-spacing:1.5px;line-height:1}
+  .brand .sep{color:var(--ink-faint);margin:0 3px;font-weight:600}
+  .brand .sub{color:var(--ink-soft);font-weight:700}
+  .ico{width:27px;height:27px;display:grid;place-items:center;border:none;border-radius:8px;
+       background:rgba(35,19,9,.07);color:var(--ink);cursor:pointer;transition:.14s;flex:none}
+  .ico:hover{background:rgba(35,19,9,.15)} .ico:active{transform:scale(.9)}
+  .ico.on{background:var(--ink);color:var(--clay)}
+  .ico svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ── status line ── */
+  .status{display:flex;align-items:center;gap:6px;margin-top:9px;font-size:10px;
+          font-weight:700;letter-spacing:.4px;color:var(--ink-soft);text-transform:uppercase}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);flex:none}
+  .dot.ok{background:var(--green);box-shadow:0 0 0 0 rgba(55,196,107,.55);animation:pulse 2.4s infinite}
+  .dot.err{background:var(--red)}
+  @keyframes pulse{70%{box-shadow:0 0 0 5px rgba(55,196,107,0)}100%{box-shadow:0 0 0 0 rgba(55,196,107,0)}}
+
+  /* ── primary metric (centered, crab-like) ── */
+  .metric{margin-top:13px}
+  .cap{font-size:9.5px;letter-spacing:2px;font-weight:700;color:var(--ink-soft);text-align:center}
+  .pct{text-align:center;font-size:62px;font-weight:800;line-height:.92;letter-spacing:-2.5px;margin:3px 0 11px}
+  .pct small{font-size:28px;font-weight:700;margin-left:2px;letter-spacing:0}
+
+  /* ── bars ── */
+  .bar{height:16px;background:var(--track);border-radius:9px;padding:2px;
+       box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+  .fill{height:100%;width:0;border-radius:7px;
+        transition:width .55s cubic-bezier(.2,.75,.2,1),background .35s;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.28)}
+  .reset{text-align:center;font-size:11px;color:var(--ink-soft);margin-top:9px;font-weight:600;letter-spacing:.2px}
+  .reset b{color:var(--ink);font-weight:800}
+
+  /* ── weekly ── */
+  .divider{height:1px;background:var(--line);margin:14px 0 12px}
+  .wkhead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:7px}
+  .wkhead .cap{text-align:left}
+  .wkhead .v{font-size:18px;font-weight:800;letter-spacing:-.5px}
+  .barmini{height:9px;background:var(--track);border-radius:6px;padding:2px;box-shadow:inset 0 1px 2px rgba(0,0,0,.45)}
+  .barmini .fill{box-shadow:none}
+
+  /* ── footer ── */
+  .foot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;
+        padding-top:11px;border-top:1px solid var(--line)}
+  .ago{font-size:10px;color:var(--ink-faint);letter-spacing:.3px}
+
+  /* ── message state ── */
+  .msg{font-size:12px;line-height:1.55;color:var(--ink-soft);padding:14px 4px;text-align:center}
+  .msg b{color:var(--ink);font-weight:800}
+
+  /* ── settings ── */
+  .panel{max-height:0;opacity:0;overflow:hidden;transition:max-height .3s ease,opacity .22s,margin .3s}
+  .panel.open{max-height:400px;opacity:1;margin-top:13px}
+  body.win .panel{transition:opacity .18s}   /* window mode: snap open so resize measures right */
+  .panel-in{background:rgba(35,19,9,.06);border-radius:13px;padding:13px}
+  .field{margin-bottom:12px} .field:last-child{margin-bottom:0}
+  .lab{font-size:9px;letter-spacing:1.4px;font-weight:800;color:var(--ink-soft);margin-bottom:6px}
+  .seg{display:flex;background:rgba(35,19,9,.09);border-radius:9px;padding:3px;gap:2px}
+  .seg button{flex:1;border:none;background:transparent;color:var(--ink-soft);font-family:var(--font);
+    font-size:11px;font-weight:700;padding:6px 2px;border-radius:7px;cursor:pointer;transition:.13s}
+  .seg button:hover{color:var(--ink)}
+  .seg button.sel{background:var(--ink);color:var(--clay)}
+  .orgrow{display:flex;gap:6px}
+  .orgrow input{flex:1;min-width:0;font-family:var(--font);font-size:11px;font-weight:600;
+    background:rgba(255,255,255,.92);color:var(--ink);border:1px solid transparent;border-radius:8px;padding:8px 9px;outline:none}
+  .orgrow input:focus{border-color:var(--ink)} .orgrow input::placeholder{color:#bd9477}
+  .pickbtn{border:none;background:var(--ink);color:var(--clay);font-family:var(--font);font-weight:700;
+    font-size:11px;border-radius:8px;padding:0 12px;cursor:pointer;transition:.13s;flex:none}
+  .pickbtn:hover{background:#3a2113} .pickbtn:active{transform:scale(.95)}
+  .orglist{margin-top:7px;display:flex;flex-direction:column;gap:5px;max-height:0;overflow:hidden;transition:max-height .26s}
+  .orglist.open{max-height:168px;overflow-y:auto}
+  .org{text-align:left;border:1px solid var(--line);background:rgba(255,255,255,.5);
+    border-radius:8px;padding:7px 9px;cursor:pointer;transition:.12s;font-family:var(--font)}
+  .org:hover{background:#fff;border-color:var(--ink)}
+  .org .nm{font-size:11px;font-weight:700;color:var(--ink)}
+  .org .id{font-size:8.5px;color:var(--ink-faint);word-break:break-all;margin-top:1px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span class="crab"><svg viewBox="0 0 9 8" shape-rendering="crispEdges" aria-label="Clawd">
+      <g fill="#d9774f">
+        <rect x="1" y="0" width="7" height="1"/>
+        <rect x="1" y="1" width="1" height="1"/><rect x="3" y="1" width="3" height="1"/><rect x="7" y="1" width="1" height="1"/>
+        <rect x="0" y="2" width="9" height="2"/>
+        <rect x="1" y="4" width="7" height="2"/>
+        <rect x="1" y="6" width="1" height="2"/><rect x="3" y="6" width="1" height="2"/><rect x="5" y="6" width="1" height="2"/><rect x="7" y="6" width="1" height="2"/>
+      </g>
+      <g fill="#1a1410"><rect x="2" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/></g>
+    </svg></span>
+    <div class="brand">CLAWD<span class="sep">·</span><span class="sub" data-i18n="limits">LIMITS</span></div>
+    <button id="popout" class="ico" title="Open in window">
+      <svg viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+    </button>
+    <button id="gear" class="ico" title="Settings">
+      <svg viewBox="0 0 24 24"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
+  </div>
+
+  <div class="status"><span id="dot" class="dot"></span><span id="statusTxt">—</span></div>
+
+  <div id="content"></div>
+
+  <div id="panel" class="panel"><div class="panel-in">
+    <div class="field">
+      <div class="lab" data-i18n="language">LANGUAGE</div>
+      <div class="seg" id="segLang"><button data-l="en">EN</button><button data-l="ru">RU</button></div>
+    </div>
+    <div class="field">
+      <div class="lab" data-i18n="view">VIEW</div>
+      <div class="seg" id="segView">
+        <button data-v="popup" data-i18n="popup">Popup</button>
+        <button data-v="window" data-i18n="window">Window</button>
+      </div>
+    </div>
+    <div class="field">
+      <div class="lab" data-i18n="refresh">REFRESH EVERY</div>
+      <div class="seg" id="segInt">
+        <button data-s="30">30s</button><button data-s="60">1m</button>
+        <button data-s="120">2m</button><button data-s="300">5m</button>
+      </div>
+    </div>
+    <div class="field">
+      <div class="lab" data-i18n="org">ORGANIZATION</div>
+      <div class="orgrow">
+        <input id="orgId" type="text" data-i18n-ph="auto" placeholder="auto-pick" spellcheck="false" autocomplete="off">
+        <button id="pick" class="pickbtn" data-i18n="choose">choose</button>
+      </div>
+      <div id="orglist" class="orglist"></div>
+    </div>
+  </div></div>
+
+</div>
+<script src="popup.js"></script>
+</body>
+</html>

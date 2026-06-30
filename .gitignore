@@ -1,0 +1,10 @@
+# dev-only preview (mocks chrome.* to render popup.js in a plain tab)
+_preview.html
+
+# build artifacts
+*.zip
+dist/
+
+# OS junk
+.DS_Store
+Thumbs.db
