@@ -122,6 +122,7 @@ function showMetric(l) {
 function tick() {
   if (!latest || latest.ok === false) return;
   if ($("rst")) $("rst").textContent = fmtRemain(latest.resetAt);
+  if ($("crst")) $("crst").textContent = fmtRemain(latest.resetAt);   // compact chip
   if ($("ago")) $("ago").textContent = fmtAgo(latest.ts);
 }
 
