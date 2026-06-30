@@ -60,6 +60,13 @@ function fmtReset(iso) {
   return h ? `${h}h${String(m).padStart(2, "0")}m` : `${m}m`;
 }
 
+function fmtMoney(minor, exp, cur) {
+  const v = (minor || 0) / Math.pow(10, exp == null ? 2 : exp);
+  const sym = { USD: "$", EUR: "€", GBP: "£" }[cur] || "";
+  const n = v.toFixed(exp == null ? 2 : exp);
+  return sym ? `${sym}${n}` : `${n} ${cur || ""}`.trim();
+}
+
 async function poll() {
   try {
     const st = await getSettings();
@@ -72,7 +79,18 @@ async function poll() {
     const reset = fmtReset(resetAt);
     const payload = `${s},${w},${reset}`;
 
-    await chrome.storage.local.set({ latest: { s, w, reset, resetAt, ts: Date.now(), ok: true } });
+    // optional extras (shown only if enabled in settings)
+    const sd = u.seven_day_sonnet;
+    const sonnet = (sd && typeof sd.utilization === "number")
+      ? { pct: Math.round(sd.utilization), resetAt: sd.resets_at || null } : null;
+    const su = u.spend && u.spend.used;
+    const extra = {
+      spent: fmtMoney(su ? su.amount_minor : 0, su ? su.exponent : 2, su ? su.currency : "USD"),
+      percent: Math.round((u.spend && u.spend.percent) || 0),
+      enabled: !!(u.spend && u.spend.enabled),
+    };
+
+    await chrome.storage.local.set({ latest: { s, w, reset, resetAt, sonnet, extra, ts: Date.now(), ok: true } });
 
     try {
       await fetch(HELPER, { method: "POST", headers: { "Content-Type": "text/plain" }, body: payload });

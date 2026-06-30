@@ -1,6 +1,6 @@
 // Clawd Limits popup — i18n, live metric, custom controls, content-fit window.
 
-const DEF = { intervalSec: 60, viewMode: "popup", orgId: "", lang: "", compact: false };
+const DEF = { intervalSec: 60, viewMode: "popup", orgId: "", lang: "", compact: false, showSonnet: false, showExtra: false, theme: "light" };
 const IS_WIN = new URLSearchParams(location.search).get("win") === "1";
 let settings = { ...DEF };
 let latest = null;
@@ -14,6 +14,9 @@ const I18N = {
     limits: "LIMITS", language: "LANGUAGE", view: "VIEW", refresh: "REFRESH EVERY",
     org: "ORGANIZATION", choose: "choose", auto: "auto-pick", window: "Window", popup: "Popup",
     session: "SESSION · 5H", weekly: "WEEKLY · 7D", resetsIn: "resets in", now: "now",
+    capSonnet: "WEEKLY · SONNET", capExtra: "EXTRA USAGE", extras: "OPTIONAL LIMITS",
+    ckSonnet: "Sonnet weekly", ckExtra: "Extra usage", spent: "spent",
+    theme: "THEME", thLight: "Light", thDark: "Dark",
     connected: "connected", notSignedIn: "not signed in on claude.ai", loading: "loading…",
     notConnTitle: "Not signed in.", notConnBody: "Open <b>claude.ai</b> in this browser and sign in.",
     noOrgs: "no orgs — sign in?", errOrgs: "error loading orgs",
@@ -23,6 +26,9 @@ const I18N = {
     limits: "ЛИМИТЫ", language: "ЯЗЫК", view: "ВИД", refresh: "ОБНОВЛЕНИЕ",
     org: "ОРГАНИЗАЦИЯ", choose: "выбрать", auto: "авто", window: "Окно", popup: "Попап",
     session: "СЕССИЯ · 5Ч", weekly: "НЕДЕЛЯ · 7Д", resetsIn: "сброс через", now: "сейчас",
+    capSonnet: "НЕДЕЛЯ · SONNET", capExtra: "ДОП. РАСХОД", extras: "ДОП. ЛИМИТЫ",
+    ckSonnet: "Sonnet (неделя)", ckExtra: "Доп. расход", spent: "потрачено",
+    theme: "ТЕМА", thLight: "Светлая", thDark: "Тёмная",
     connected: "подключено", notSignedIn: "вход в claude.ai не выполнен", loading: "загрузка…",
     notConnTitle: "Вход не выполнен.", notConnBody: "Откройте <b>claude.ai</b> в этом браузере и войдите.",
     noOrgs: "нет организаций — войдите?", errOrgs: "ошибка загрузки",
@@ -82,6 +88,7 @@ function resizeWindow() {
 const REFRESH_SVG = '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>';
 
 function metricShell() {
+  optSig = "";
   content.innerHTML =
     '<div class="metric">' +
     `<div class="cap">${t("session")}</div>` +
@@ -91,9 +98,35 @@ function metricShell() {
     '<div class="divider"></div>' +
     `<div class="wkhead"><div class="cap">${t("weekly")}</div><div class="v" id="wv">--%</div></div>` +
     '<div class="barmini"><div class="fill" id="bw"></div></div>' +
+    '<div id="opt"></div>' +
     `<div class="foot"><span class="ago" id="ago"></span><button id="refresh" class="ico">${REFRESH_SVG}</button></div>` +
     '</div>';
   $("refresh").addEventListener("click", pollNow);
+}
+
+// Optional extra rows (Sonnet weekly / Extra usage) — toggled in settings.
+// Rebuild structure only when the visible set changes; otherwise just update values.
+let optSig = "";
+function renderOptional(l) {
+  const opt = $("opt"); if (!opt) return;
+  const showSn = settings.showSonnet && l && l.sonnet;
+  const showEx = settings.showExtra && l && l.extra;
+  const sig = `${showSn ? 1 : 0}${showEx ? 1 : 0}|${settings.lang}`;
+  if (sig !== optSig) {
+    let html = "";
+    if (showSn) html +=
+      '<div class="divider"></div>' +
+      `<div class="wkhead"><div class="cap">${t("capSonnet")}</div><div class="v" id="snv">--%</div></div>` +
+      '<div class="barmini"><div class="fill" id="snbar"></div></div>';
+    if (showEx) html +=
+      '<div class="divider"></div>' +
+      `<div class="wkhead"><div class="cap">${t("capExtra")}</div><div class="v" id="exv">--</div></div>` +
+      '<div class="barmini"><div class="fill" id="exbar"></div></div>';
+    opt.innerHTML = html;
+    optSig = sig;
+  }
+  if (showSn) { $("snv").textContent = l.sonnet.pct + "%"; setFill("snbar", l.sonnet.pct); }
+  if (showEx) { $("exv").textContent = `${l.extra.spent} · ${l.extra.percent}%`; setFill("exbar", l.extra.percent); }
 }
 
 function setStatus(state) {
@@ -115,6 +148,7 @@ function showMetric(l) {
   $("wv").textContent = l.w + "%";
   setFill("bw", l.w);
   if ($("cpv")) { $("cpv").textContent = l.s; setFill("cbf", l.s); }   // compact chip
+  renderOptional(l);
   tick();
   resizeWindow();
 }
@@ -150,8 +184,11 @@ function markSeg(seg, attr, val) {
 }
 function syncControls() {
   markSeg($("segLang"), "l", settings.lang);
+  markSeg($("segTheme"), "th", settings.theme);
   markSeg($("segView"), "v", settings.viewMode);
   markSeg($("segInt"), "s", settings.intervalSec);
+  $("ckSonnet").checked = !!settings.showSonnet;
+  $("ckExtra").checked = !!settings.showExtra;
   $("orgId").value = settings.orgId || "";
 }
 function applyLang() {
@@ -161,6 +198,9 @@ function applyLang() {
   content.innerHTML = "";        // force metric shell rebuild in new language
   showMetric(latest);
   syncControls();
+}
+function applyTheme() {
+  document.documentElement.classList.toggle("dark", settings.theme === "dark");
 }
 
 $("gear").addEventListener("click", () => {
@@ -184,6 +224,10 @@ $("segLang").addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
   settings.lang = b.dataset.l; applyLang(); saveSettings();
 });
+$("segTheme").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  settings.theme = b.dataset.th; applyTheme(); markSeg($("segTheme"), "th", settings.theme); saveSettings();
+});
 $("segView").addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
   settings.viewMode = b.dataset.v; markSeg($("segView"), "v", settings.viewMode); saveSettings();
@@ -192,6 +236,12 @@ $("segInt").addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
   settings.intervalSec = parseInt(b.dataset.s, 10);
   markSeg($("segInt"), "s", settings.intervalSec); saveSettings(); restartPollTimer();
+});
+$("ckSonnet").addEventListener("change", () => {
+  settings.showSonnet = $("ckSonnet").checked; saveSettings(); showMetric(latest); resizeWindow();
+});
+$("ckExtra").addEventListener("change", () => {
+  settings.showExtra = $("ckExtra").checked; saveSettings(); showMetric(latest); resizeWindow();
 });
 $("orgId").addEventListener("change", () => {
   settings.orgId = $("orgId").value.trim(); saveSettings(); pollNow();
@@ -234,6 +284,7 @@ chrome.storage.onChanged.addListener((ch, area) => {
   settings = { ...DEF, ...(s || {}) };
   if (!settings.lang) settings.lang = (navigator.language || "en").toLowerCase().startsWith("ru") ? "ru" : "en";
   if (settings.compact) document.body.classList.add("compact");
+  applyTheme();
   applyLang();          // sets labels + renders cached state
   await loadLatest();
   pollNow();

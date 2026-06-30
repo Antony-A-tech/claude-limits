@@ -13,6 +13,24 @@
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{background:var(--clay)}
+
+  /* ── dark theme (toggle in settings) ── */
+  .dark{
+    --clay:#1b1613; --clay-hi:#221b16; --clay-lo:#14100d;
+    --ink:#efe6dc; --ink-soft:#b6a392; --ink-faint:#7e6e5f;
+    --track:#2a231c; --line:rgba(255,255,255,.09); --accent:#d9774f;
+  }
+  .dark .ico{background:rgba(255,255,255,.07)}
+  .dark .ico:hover{background:rgba(255,255,255,.15)}
+  .dark .panel-in{background:rgba(255,255,255,.05)}
+  .dark .seg{background:rgba(255,255,255,.06)}
+  .dark .chk .sw{background:rgba(255,255,255,.14)}
+  .dark .chk input:checked + .sw{background:var(--accent)}
+  .dark .pickbtn:hover{background:#d8cfc4}
+  .dark .orgrow input{background:rgba(255,255,255,.07);color:var(--ink)}
+  .dark .orgrow input::placeholder{color:#7e6e5f}
+  .dark .org{background:rgba(255,255,255,.05);border-color:var(--line)}
+  .dark .org:hover{background:rgba(255,255,255,.11);border-color:var(--ink)}
   body{
     width:312px; font-family:var(--font); color:var(--ink);
     -webkit-font-smoothing:antialiased; user-select:none; overflow:hidden;
@@ -84,6 +102,13 @@
     font-size:11px;font-weight:700;padding:6px 2px;border-radius:7px;cursor:pointer;transition:.13s}
   .seg button:hover{color:var(--ink)}
   .seg button.sel{background:var(--ink);color:var(--clay)}
+  .chk{display:flex;align-items:center;justify-content:space-between;padding:7px 1px;cursor:pointer;font-size:11px;font-weight:700;color:var(--ink-soft);transition:.13s}
+  .chk:hover{color:var(--ink)}
+  .chk input{position:absolute;opacity:0;pointer-events:none}
+  .chk .sw{width:34px;height:19px;border-radius:11px;background:rgba(35,19,9,.2);position:relative;transition:.18s;flex:none}
+  .chk .sw::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:.18s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+  .chk input:checked + .sw{background:var(--ink)}
+  .chk input:checked + .sw::after{transform:translateX(15px)}
   .orgrow{display:flex;gap:6px}
   .orgrow input{flex:1;min-width:0;font-family:var(--font);font-size:11px;font-weight:600;
     background:rgba(255,255,255,.92);color:var(--ink);border:1px solid transparent;border-radius:8px;padding:8px 9px;outline:none}
@@ -144,6 +169,13 @@
 
   <div id="panel" class="panel"><div class="panel-in">
     <div class="field">
+      <div class="lab" data-i18n="theme">THEME</div>
+      <div class="seg" id="segTheme">
+        <button data-th="light" data-i18n="thLight">Light</button>
+        <button data-th="dark" data-i18n="thDark">Dark</button>
+      </div>
+    </div>
+    <div class="field">
       <div class="lab" data-i18n="language">LANGUAGE</div>
       <div class="seg" id="segLang"><button data-l="en">EN</button><button data-l="ru">RU</button></div>
     </div>
@@ -160,6 +192,11 @@
         <button data-s="30">30s</button><button data-s="60">1m</button>
         <button data-s="120">2m</button><button data-s="300">5m</button>
       </div>
+    </div>
+    <div class="field">
+      <div class="lab" data-i18n="extras">OPTIONAL LIMITS</div>
+      <label class="chk"><span data-i18n="ckSonnet">Sonnet weekly</span><input type="checkbox" id="ckSonnet"><span class="sw"></span></label>
+      <label class="chk"><span data-i18n="ckExtra">Extra usage</span><input type="checkbox" id="ckExtra"><span class="sw"></span></label>
     </div>
     <div class="field">
       <div class="lab" data-i18n="org">ORGANIZATION</div>
