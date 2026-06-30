@@ -1,6 +1,6 @@
 // Clawd Limits popup — i18n, live metric, custom controls, content-fit window.
 
-const DEF = { intervalSec: 60, viewMode: "popup", orgId: "", lang: "" };
+const DEF = { intervalSec: 60, viewMode: "popup", orgId: "", lang: "", compact: false };
 const IS_WIN = new URLSearchParams(location.search).get("win") === "1";
 let settings = { ...DEF };
 let latest = null;
@@ -21,7 +21,7 @@ const I18N = {
   },
   ru: {
     limits: "ЛИМИТЫ", language: "ЯЗЫК", view: "ВИД", refresh: "ОБНОВЛЕНИЕ",
-    org: "ОРГАНИЗАЦИЯ", choose: "выбрать", auto: "авто", window: "Окно", popup: "Popup",
+    org: "ОРГАНИЗАЦИЯ", choose: "выбрать", auto: "авто", window: "Окно", popup: "Попап",
     session: "СЕССИЯ · 5Ч", weekly: "НЕДЕЛЯ · 7Д", resetsIn: "сброс через", now: "сейчас",
     connected: "подключено", notSignedIn: "вход в claude.ai не выполнен", loading: "загрузка…",
     notConnTitle: "Вход не выполнен.", notConnBody: "Откройте <b>claude.ai</b> в этом браузере и войдите.",
@@ -114,6 +114,7 @@ function showMetric(l) {
   setFill("bf", l.s);
   $("wv").textContent = l.w + "%";
   setFill("bw", l.w);
+  if ($("cpv")) { $("cpv").textContent = l.s; setFill("cbf", l.s); }   // compact chip
   tick();
   resizeWindow();
 }
@@ -166,6 +167,15 @@ $("gear").addEventListener("click", () => {
   $("gear").classList.toggle("on", open);
   setTimeout(resizeWindow, IS_WIN ? 0 : 0);
 });
+$("compact").addEventListener("click", () => setCompact(true));
+$("cexpand").addEventListener("click", () => setCompact(false));
+function setCompact(on) {
+  document.body.classList.toggle("compact", on);
+  settings.compact = on;
+  saveSettings();
+  showMetric(latest);
+  resizeWindow();
+}
 $("popout").addEventListener("click", async () => {
   try { await chrome.runtime.sendMessage({ type: "popout" }); window.close(); } catch (e) {}
 });
@@ -222,6 +232,7 @@ chrome.storage.onChanged.addListener((ch, area) => {
   const { settings: s } = await chrome.storage.local.get("settings");
   settings = { ...DEF, ...(s || {}) };
   if (!settings.lang) settings.lang = (navigator.language || "en").toLowerCase().startsWith("ru") ? "ru" : "en";
+  if (settings.compact) document.body.classList.add("compact");
   applyLang();          // sets labels + renders cached state
   await loadLatest();
   pollNow();

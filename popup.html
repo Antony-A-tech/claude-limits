@@ -98,6 +98,17 @@
   .org:hover{background:#fff;border-color:var(--ink)}
   .org .nm{font-size:11px;font-weight:700;color:var(--ink)}
   .org .id{font-size:8.5px;color:var(--ink-faint);word-break:break-all;margin-top:1px}
+
+  /* ── compact / mini view ── */
+  #chip{display:none;align-items:center;gap:10px;padding:9px 11px}
+  body.compact{width:212px}
+  body.compact .wrap{display:none}
+  body.compact #chip{display:flex}
+  .chipmain{flex:1;min-width:0}
+  .cpct{font-size:23px;font-weight:800;letter-spacing:-1px;line-height:1}
+  .cpct i{font-size:13px;font-weight:700;font-style:normal;margin-left:1px}
+  .cbar{height:7px;background:var(--track);border-radius:5px;padding:2px;margin-top:6px;box-shadow:inset 0 1px 2px rgba(0,0,0,.45)}
+  .cbar .fill{box-shadow:none}
 </style>
 </head>
 <body>
@@ -115,6 +126,9 @@
       <g fill="#1a1410"><rect x="2" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/></g>
     </svg></span>
     <div class="brand">CLAWD<span class="sep">·</span><span class="sub" data-i18n="limits">LIMITS</span></div>
+    <button id="compact" class="ico" title="Compact view">
+      <svg viewBox="0 0 24 24"><path d="m15 15 6 6m-6-6v4.8m0-4.8h4.8"/><path d="M9 19.8V15m0 0H4.2M9 15l-6 6"/><path d="M15 4.2V9m0 0h4.8M15 9l6-6"/><path d="M9 4.2V9m0 0H4.2M9 9 3 3"/></svg>
+    </button>
     <button id="popout" class="ico" title="Open in window">
       <svg viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
     </button>
@@ -156,6 +170,24 @@
     </div>
   </div></div>
 
+</div>
+
+<div id="chip">
+  <span class="crab"><svg viewBox="0 0 9 8" shape-rendering="crispEdges" aria-label="Clawd">
+    <g fill="#d9774f">
+      <rect x="1" y="0" width="7" height="1"/>
+      <rect x="1" y="1" width="1" height="1"/><rect x="3" y="1" width="3" height="1"/><rect x="7" y="1" width="1" height="1"/>
+      <rect x="0" y="2" width="9" height="2"/>
+      <rect x="1" y="4" width="7" height="2"/>
+      <rect x="1" y="6" width="1" height="2"/><rect x="3" y="6" width="1" height="2"/><rect x="5" y="6" width="1" height="2"/><rect x="7" y="6" width="1" height="2"/>
+    </g>
+    <g fill="#1a1410"><rect x="2" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/></g>
+  </svg></span>
+  <div class="chipmain">
+    <div class="cpct"><span id="cpv">--</span><i>%</i></div>
+    <div class="cbar"><div class="fill" id="cbf"></div></div>
+  </div>
+  <button id="cexpand" class="ico" title="Expand"><svg viewBox="0 0 24 24"><path d="m15 15 6 6"/><path d="m15 9 6-6"/><path d="M21 16v5h-5"/><path d="M21 8V3h-5"/><path d="M3 16v5h5"/><path d="m3 21 6-6"/><path d="M3 8V3h5"/><path d="M9 9 3 3"/></svg></button>
 </div>
 <script src="popup.js"></script>
 </body>
