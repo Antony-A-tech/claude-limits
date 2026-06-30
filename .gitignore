@@ -1,5 +1,7 @@
-# dev-only preview (mocks chrome.* to render popup.js in a plain tab)
+# dev-only previews (mock chrome.* / icon generator — not part of the extension)
 _preview.html
+_icongen.html
+_icon_variants.png
 
 # build artifacts
 *.zip
