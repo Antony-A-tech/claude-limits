@@ -109,8 +109,8 @@ function metricShell() {
 let optSig = "";
 function renderOptional(l) {
   const opt = $("opt"); if (!opt) return;
-  const showSn = settings.showSonnet && l && l.sonnet;
-  const showEx = settings.showExtra && l && l.extra;
+  const showSn = settings.showSonnet;                 // show the row whenever the toggle is on...
+  const showEx = settings.showExtra;
   const sig = `${showSn ? 1 : 0}${showEx ? 1 : 0}|${settings.lang}`;
   if (sig !== optSig) {
     let html = "";
@@ -125,8 +125,9 @@ function renderOptional(l) {
     opt.innerHTML = html;
     optSig = sig;
   }
-  if (showSn) { $("snv").textContent = l.sonnet.pct + "%"; setFill("snbar", l.sonnet.pct); }
-  if (showEx) { $("exv").textContent = `${l.extra.spent} · ${l.extra.percent}%`; setFill("exbar", l.extra.percent); }
+  const sn = l && l.sonnet, ex = l && l.extra;        // ...with "—" if the API returns no data for it
+  if (showSn) { $("snv").textContent = sn ? sn.pct + "%" : "—"; setFill("snbar", sn ? sn.pct : 0); }
+  if (showEx) { $("exv").textContent = ex ? `${ex.spent} · ${ex.percent}%` : "—"; setFill("exbar", ex ? ex.percent : 0); }
 }
 
 function setStatus(state) {
