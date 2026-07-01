@@ -37,6 +37,14 @@
   }
   .wrap{padding:13px 15px 14px}
 
+  /* custom scrollbar — replace the chunky native one */
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:rgba(35,19,9,.22);border-radius:6px;border:2px solid transparent;background-clip:padding-box}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(35,19,9,.4);background-clip:padding-box}
+  .dark::-webkit-scrollbar-thumb,.dark ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);background-clip:padding-box}
+  .dark::-webkit-scrollbar-thumb:hover,.dark ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.3);background-clip:padding-box}
+
   /* ── header ── */
   .top{display:flex; align-items:center; gap:9px}
   .crab{width:26px;height:24px;flex:none;background:#edece6;border-radius:7px;display:grid;place-items:center;box-shadow:0 1px 2px rgba(0,0,0,.14)}
@@ -92,8 +100,9 @@
 
   /* ── settings ── */
   .panel{max-height:0;opacity:0;overflow:hidden;transition:max-height .3s ease,opacity .22s,margin .3s}
-  .panel.open{max-height:400px;opacity:1;margin-top:13px}
-  body.win .panel{transition:opacity .18s}   /* window mode: snap open so resize measures right */
+  .panel.open{max-height:680px;opacity:1;margin-top:13px}   /* fits all fields + open org list */
+  body.win .panel{transition:opacity .18s}     /* window mode: snap so resize measures right */
+  body.win .orglist{transition:none}           /* ...same for the org list */
   .panel-in{background:rgba(35,19,9,.06);border-radius:13px;padding:13px}
   .field{margin-bottom:12px} .field:last-child{margin-bottom:0}
   .lab{font-size:9px;letter-spacing:1.4px;font-weight:800;color:var(--ink-soft);margin-bottom:6px}

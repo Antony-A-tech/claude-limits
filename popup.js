@@ -271,6 +271,7 @@ $("pick").addEventListener("click", async () => {
     list.innerHTML = `<div class="org"><div class="nm">${t("errOrgs")}</div></div>`;
   }
   resizeWindow();
+  setTimeout(() => $("orglist").scrollIntoView({ block: "nearest" }), 120);
 });
 
 chrome.storage.onChanged.addListener((ch, area) => {
