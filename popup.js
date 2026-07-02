@@ -14,8 +14,8 @@ const I18N = {
     limits: "LIMITS", language: "LANGUAGE", view: "VIEW", refresh: "REFRESH EVERY",
     org: "ORGANIZATION", choose: "choose", auto: "auto-pick", window: "Window", popup: "Popup",
     session: "SESSION · 5H", weekly: "WEEKLY · 7D", resetsIn: "resets in", now: "now",
-    capSonnet: "WEEKLY · SONNET", capExtra: "EXTRA USAGE", extras: "OPTIONAL LIMITS",
-    ckSonnet: "Sonnet weekly", ckExtra: "Extra usage", spent: "spent",
+    weeklyWord: "WEEKLY", capExtra: "EXTRA USAGE", extras: "OPTIONAL LIMITS",
+    ckSonnet: "Weekly (per model)", ckExtra: "Extra usage", spent: "spent",
     theme: "THEME", thLight: "Light", thDark: "Dark",
     connected: "connected", notSignedIn: "not signed in on claude.ai", loading: "loading…",
     notConnTitle: "Not signed in.", notConnBody: "Open <b>claude.ai</b> in this browser and sign in.",
@@ -26,8 +26,8 @@ const I18N = {
     limits: "ЛИМИТЫ", language: "ЯЗЫК", view: "ВИД", refresh: "ОБНОВЛЕНИЕ",
     org: "ОРГАНИЗАЦИЯ", choose: "выбрать", auto: "авто", window: "Окно", popup: "Попап",
     session: "СЕССИЯ · 5Ч", weekly: "НЕДЕЛЯ · 7Д", resetsIn: "сброс через", now: "сейчас",
-    capSonnet: "НЕДЕЛЯ · SONNET", capExtra: "ДОП. РАСХОД", extras: "ДОП. ЛИМИТЫ",
-    ckSonnet: "Sonnet (неделя)", ckExtra: "Доп. расход", spent: "потрачено",
+    weeklyWord: "НЕДЕЛЯ", capExtra: "ДОП. РАСХОД", extras: "ДОП. ЛИМИТЫ",
+    ckSonnet: "Неделя (по модели)", ckExtra: "Доп. расход", spent: "потрачено",
     theme: "ТЕМА", thLight: "Светлая", thDark: "Тёмная",
     connected: "подключено", notSignedIn: "вход в claude.ai не выполнен", loading: "загрузка…",
     notConnTitle: "Вход не выполнен.", notConnBody: "Откройте <b>claude.ai</b> в этом браузере и войдите.",
@@ -113,7 +113,7 @@ function renderOptional(l) {
     let html = "";
     if (showSn) html +=
       '<div class="divider"></div>' +
-      `<div class="wkhead"><div class="cap">${t("capSonnet")}</div><div class="v" id="snv">--%</div></div>` +
+      `<div class="wkhead"><div class="cap" id="sncap"></div><div class="v" id="snv">--%</div></div>` +
       '<div class="barmini"><div class="fill" id="snbar"></div></div>';
     if (showEx) html +=
       '<div class="divider"></div>' +
@@ -122,8 +122,12 @@ function renderOptional(l) {
     opt.innerHTML = html;
     optSig = sig;
   }
-  const sn = l && l.sonnet, ex = l && l.extra;        // ...with "—" if the API returns no data for it
-  if (showSn) { $("snv").textContent = sn ? sn.pct + "%" : "—"; setFill("snbar", sn ? sn.pct : 0); }
+  const sc = l && l.scoped, ex = l && l.extra;        // "—" if the API returns no data for it
+  if (showSn) {
+    $("sncap").textContent = `${t("weeklyWord")} · ${sc && sc.model ? sc.model.toUpperCase() : "—"}`;
+    $("snv").textContent = sc ? sc.pct + "%" : "—";
+    setFill("snbar", sc ? sc.pct : 0);
+  }
   if (showEx) { $("exv").textContent = ex ? `${ex.spent} · ${ex.percent}%` : "—"; setFill("exbar", ex ? ex.percent : 0); }
 }
 

@@ -80,9 +80,14 @@ async function poll() {
     const payload = `${s},${w},${reset}`;
 
     // optional extras (shown only if enabled in settings)
-    const sd = u.seven_day_sonnet;
-    const sonnet = (sd && typeof sd.utilization === "number")
-      ? { pct: Math.round(sd.utilization), resetAt: sd.resets_at || null } : null;
+    // scoped weekly limit = the per-model weekly cap (currently "Fable"), read
+    // dynamically from limits[] so it follows whatever model Anthropic scopes next.
+    const ws = Array.isArray(u.limits) ? u.limits.find((x) => x.kind === "weekly_scoped") : null;
+    const scoped = ws ? {
+      pct: Math.round(ws.percent || 0),
+      resetAt: ws.resets_at || null,
+      model: (ws.scope && ws.scope.model && ws.scope.model.display_name) || "",
+    } : null;
     const su = u.spend && u.spend.used;
     const extra = {
       spent: fmtMoney(su ? su.amount_minor : 0, su ? su.exponent : 2, su ? su.currency : "USD"),
@@ -90,7 +95,7 @@ async function poll() {
       enabled: !!(u.spend && u.spend.enabled),
     };
 
-    await chrome.storage.local.set({ latest: { s, w, reset, resetAt, sonnet, extra, ts: Date.now(), ok: true } });
+    await chrome.storage.local.set({ latest: { s, w, reset, resetAt, scoped, extra, ts: Date.now(), ok: true } });
 
     try {
       await fetch(HELPER, { method: "POST", headers: { "Content-Type": "text/plain" }, body: payload });
