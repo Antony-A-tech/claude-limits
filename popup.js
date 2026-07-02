@@ -85,8 +85,6 @@ function resizeWindow() {
 }
 
 // ── rendering ─────────────────────────────────────────────────────
-const REFRESH_SVG = '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>';
-
 function metricShell() {
   optSig = "";
   content.innerHTML =
@@ -99,9 +97,8 @@ function metricShell() {
     `<div class="wkhead"><div class="cap">${t("weekly")}</div><div class="v" id="wv">--%</div></div>` +
     '<div class="barmini"><div class="fill" id="bw"></div></div>' +
     '<div id="opt"></div>' +
-    `<div class="foot"><span class="ago" id="ago"></span><button id="refresh" class="ico">${REFRESH_SVG}</button></div>` +
+    '<div class="foot"><span class="ago" id="ago"></span></div>' +
     '</div>';
-  $("refresh").addEventListener("click", pollNow);
 }
 
 // Optional extra rows (Sonnet weekly / Extra usage) — toggled in settings.
@@ -209,6 +206,8 @@ $("gear").addEventListener("click", () => {
   $("gear").classList.toggle("on", open);
   setTimeout(resizeWindow, IS_WIN ? 0 : 0);
 });
+$("refresh").addEventListener("click", pollNow);      // header refresh (full view)
+$("crefresh").addEventListener("click", pollNow);     // chip refresh (mini view)
 $("compact").addEventListener("click", () => setCompact(true));
 $("cexpand").addEventListener("click", () => setCompact(false));
 function setCompact(on) {

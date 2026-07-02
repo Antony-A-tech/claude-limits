@@ -46,10 +46,10 @@
   .dark::-webkit-scrollbar-thumb:hover,.dark ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.3);background-clip:padding-box}
 
   /* ── header ── */
-  .top{display:flex; align-items:center; gap:9px}
+  .top{display:flex; align-items:center; gap:6px}
   .crab{width:26px;height:24px;flex:none;background:#edece6;border-radius:7px;display:grid;place-items:center;box-shadow:0 1px 2px rgba(0,0,0,.14)}
   .crab svg{width:18px;height:16px;display:block}
-  .brand{flex:1;font-size:12px;font-weight:800;letter-spacing:1.5px;line-height:1}
+  .brand{flex:1;min-width:0;font-size:12px;font-weight:800;letter-spacing:1.5px;line-height:1;white-space:nowrap;overflow:hidden}
   .brand .sep{color:var(--ink-faint);margin:0 3px;font-weight:600}
   .brand .sub{color:var(--ink-soft);font-weight:700}
   .ico{width:27px;height:27px;display:grid;place-items:center;border:none;border-radius:8px;
@@ -90,7 +90,7 @@
   .barmini .fill{box-shadow:none}
 
   /* ── footer ── */
-  .foot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;
+  .foot{display:flex;align-items:center;justify-content:center;margin-top:14px;
         padding-top:11px;border-top:1px solid var(--line)}
   .ago{font-size:10px;color:var(--ink-faint);letter-spacing:.3px}
 
@@ -161,6 +161,9 @@
       <g fill="#1a1410"><rect x="2" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/></g>
     </svg></span>
     <div class="brand">CLAWD<span class="sep">·</span><span class="sub" data-i18n="limits">LIMITS</span></div>
+    <button id="refresh" class="ico" title="Refresh">
+      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+    </button>
     <button id="compact" class="ico" title="Compact view">
       <svg viewBox="0 0 24 24"><path d="m15 15 6 6m-6-6v4.8m0-4.8h4.8"/><path d="M9 19.8V15m0 0H4.2M9 15l-6 6"/><path d="M15 4.2V9m0 0h4.8M15 9l6-6"/><path d="M9 4.2V9m0 0H4.2M9 9 3 3"/></svg>
     </button>
@@ -234,6 +237,7 @@
     <div class="cpct"><span id="cpv">--</span><i>%</i><span class="crst" id="crst">--</span></div>
     <div class="cbar"><div class="fill" id="cbf"></div></div>
   </div>
+  <button id="crefresh" class="ico" title="Refresh"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></button>
   <button id="cexpand" class="ico" title="Expand"><svg viewBox="0 0 24 24"><path d="m15 15 6 6"/><path d="m15 9 6-6"/><path d="M21 16v5h-5"/><path d="M21 8V3h-5"/><path d="M3 16v5h5"/><path d="m3 21 6-6"/><path d="M3 8V3h5"/><path d="M9 9 3 3"/></svg></button>
 </div>
 <script src="popup.js"></script>
